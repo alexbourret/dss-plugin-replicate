@@ -82,7 +82,7 @@
                     "label": "Service API token"
                 }
             ],
-            "defaultValue": "service-token",
+            "defaultValue": "service-api-token",
             "visibilityCondition": false
         },
         {
@@ -90,7 +90,7 @@
             "label": "Service token",
             "type": "PRESET",
             "parameterSetId": "service-api-token",
-            "visibilityCondition": "model.auth_type == 'oauth'"
+            "visibilityCondition": "model.auth_type == 'service-api-token'"
         },
         {
             "name": "model",
