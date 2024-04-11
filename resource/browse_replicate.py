@@ -11,5 +11,5 @@ def do(payload, config, plugin_config, inputs):
     print("ALX:parameter_name={}".format(parameter_name))
     if parameter_name == "model":
         print("ALX:model!")
-        choices.text_message(api_token)
+        return choices.text_message(api_token)
     return choices.to_dss()
