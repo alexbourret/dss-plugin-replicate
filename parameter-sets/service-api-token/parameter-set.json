@@ -16,7 +16,7 @@
             "name": "api_token",
             "label": "API token",
             "type": "PASSWORD",
-            "description": "See replicate.com documentation",
+            "description": "Get your token from replicate.com/account/api-tokens",
             "mandatory": true
         }
     ]
