@@ -82,8 +82,7 @@
                     "label": "Service API token"
                 }
             ],
-            "defaultValue": "service-api-token",
-            "visibilityCondition": false
+            "defaultValue": "service-api-token"
         },
         {
             "name": "service_token",
