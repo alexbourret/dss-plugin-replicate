@@ -78,12 +78,19 @@
             "type": "SELECT",
             "selectChoices": [
                 {
-                    "value": "service-token",
+                    "value": "service-api-token",
                     "label": "Service token"
                 }
             ],
             "defaultValue": "service-token",
             "visibilityCondition": false
+        },
+        {
+            "name": "service_token",
+            "label": "Service token",
+            "type": "PRESET",
+            "parameterSetId": "service-api-token",
+            "visibilityCondition": "model.auth_type == 'oauth'"
         },
         {
             "name": "model",
