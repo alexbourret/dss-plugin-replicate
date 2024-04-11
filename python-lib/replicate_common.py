@@ -68,4 +68,5 @@ def get_api_token(config):
         print("ALX:3")
         token = config.get("service_token", {}).get("api_token")
         print("ALX:4:{}".format(token))
+    print("ALX:5:{}".format(token))
     return token
