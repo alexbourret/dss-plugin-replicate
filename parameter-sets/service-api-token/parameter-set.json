@@ -2,7 +2,7 @@
     "meta" : {
         "label": "Service API token",
         "description": "",
-        "icon": "fas fa-puzzle-piece"
+        "icon": "fab fa-red-river fas fa-puzzle-piece"
     },
     "defaultDefinableInline": true,
     "defaultDefinableAtProjectLevel": true,
