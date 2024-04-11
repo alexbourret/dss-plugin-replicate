@@ -5,4 +5,5 @@ class ReplicateClient(object):
         self.api_token = api_token
 
     def get_available_models(self):
-        pass
+        collections = [collection for page in replicate.paginate(replicate.collections.list) for collection in page]
+        
