@@ -79,7 +79,7 @@
             "selectChoices": [
                 {
                     "value": "service-api-token",
-                    "label": "Service token"
+                    "label": "Service API token"
                 }
             ],
             "defaultValue": "service-token",
