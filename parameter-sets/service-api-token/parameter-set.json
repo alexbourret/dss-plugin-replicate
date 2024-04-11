@@ -14,7 +14,7 @@
     "params": [
         {
             "name": "api_token",
-            "label": "API key",
+            "label": "API token",
             "type": "PASSWORD",
             "description": "See replicate.com documentation",
             "mandatory": true
