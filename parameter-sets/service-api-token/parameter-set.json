@@ -1,6 +1,6 @@
 {
     "meta" : {
-        "label": "Service API key",
+        "label": "Service API token",
         "description": "",
         "icon": "fas fa-puzzle-piece"
     },
@@ -13,7 +13,7 @@
 
     "params": [
         {
-            "name": "api_key",
+            "name": "api_token",
             "label": "API key",
             "type": "PASSWORD",
             "description": "See replicate.com documentation",
