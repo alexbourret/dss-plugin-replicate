@@ -73,6 +73,25 @@
 
     "params": [
         {
+            "name": "auth_type",
+            "label": "Type of authentication",
+            "type": "SELECT",
+            "selectChoices": [
+                {
+                    "value": "service-token",
+                    "label": "Service token"
+                }
+            ],
+            "defaultValue": "service-token",
+            "visibilityCondition": false
+        },
+        {
+            "name": "model",
+            "label": "Model",
+            "type": "SELECT",
+            "getChoicesFromPython": true
+        },
+        {
             "name": "parameter1",
             "label": "User-readable label",
             "type": "STRING",
