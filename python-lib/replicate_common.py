@@ -61,7 +61,11 @@ class DSSSelectorChoices(object):
 # LX:do:payload={'parameterType': 'SELECT', 'parameterName': 'model', 'customChoices': True, 'rootModel': {'auth_type': 'service-api-token', 'parameter2': 42, 'service_token': {'mode': 'PRESET', 'name': 'Alex B'}}}, config={'auth_type': 'service-api-token', 'parameter2': 42, 'service_token': {'api_token': 'blaa'}}
 def get_api_token(config):
     token = None
+    print("ALX:1")
     auth_type = config.get("auth_type", "service-api-token")
+    print("ALX:2:{}".format(auth_type))
     if auth_type == "service-api-token":
+        print("ALX:3")
         token = config.get("service_token", {}).get("api_token")
+        print("ALX:4:{}".format(token))
     return token
