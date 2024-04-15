@@ -11,5 +11,14 @@ class ReplicateSession(object):
         for item in get_next_item():
             yield item
 
-    def get_next_item(self):
+    def get_next_item(self, url=None):
+        for page in self.get_next_page(url=url):
+            row = page.get("results", [])
+            yield row
+
+    def get_next_page(self):
         response = self.get()
+        
+    def get(self, **kwargs):
+        response = self.session.get(**kwargs)
+        return response
