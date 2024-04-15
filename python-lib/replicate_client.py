@@ -13,8 +13,9 @@ class ReplicateSession(object):
 
     def get_next_item(self, url=None):
         for page in self.get_next_page(url=url):
-            row = page.get("results", [])
-            yield row
+            rows = page.get("results", [])
+            for row in rows:
+                yield row
 
     def get_next_page(self):
         response = self.get()
