@@ -8,5 +8,8 @@ class ReplicateSession(object):
         self.session.auth = ReplicateAuth(access_token=api_token)
 
     def get_available_models(self):
-        collections = [collection for page in replicate.paginate(replicate.collections.list) for collection in page]
-        return collections
+        for item in get_next_item():
+            yield item
+
+    def get_next_item(self):
+        response = self.get()
