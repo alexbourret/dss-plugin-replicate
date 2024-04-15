@@ -6,4 +6,4 @@ class ReplicateClient(object):
 
     def get_available_models(self):
         collections = [collection for page in replicate.paginate(replicate.collections.list) for collection in page]
-        
+        return collections
