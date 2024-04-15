@@ -19,7 +19,7 @@ class ReplicateSession(object):
 
     def get_next_page(self, url=None):
         response = self.get()
-        
+
     def get(self, **kwargs):
         response = self.session.get(**kwargs)
         return response
