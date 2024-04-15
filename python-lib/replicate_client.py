@@ -22,7 +22,7 @@ class ReplicateSession(object):
         url = self.next_page or url
         response = self.get(url)
         json_response = safe_json(response)
-        next_page = response.get("next", None)
+        next_page = json_response.get("next", None)
 
     def get(self, **kwargs):
         response = self.session.get(**kwargs)
