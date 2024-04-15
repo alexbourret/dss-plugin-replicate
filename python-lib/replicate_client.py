@@ -17,7 +17,7 @@ class ReplicateSession(object):
             for row in rows:
                 yield row
 
-    def get_next_page(self):
+    def get_next_page(self, url=None):
         response = self.get()
         
     def get(self, **kwargs):
