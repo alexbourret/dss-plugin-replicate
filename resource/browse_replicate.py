@@ -10,5 +10,7 @@ def do(payload, config, plugin_config, inputs):
     parameter_name = payload.get("parameterName")
     if parameter_name == "model":
         client = ReplicateClient(api_token=api_token)
+        models = client.get_available_models()
+        print("ALX:models={}".format(models))
         return choices.text_message(api_token)
     return choices.to_dss()
