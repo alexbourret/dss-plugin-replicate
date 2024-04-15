@@ -6,6 +6,7 @@ class ReplicateSession(object):
     def __init__(self, api_token=None):
         self.session = request.Session()
         self.session.auth = ReplicateAuth(access_token=api_token)
+        self.next_page = None
 
     def get_available_models(self):
         for item in get_next_item():
@@ -18,8 +19,15 @@ class ReplicateSession(object):
                 yield row
 
     def get_next_page(self, url=None):
-        response = self.get()
+        url = self.next_page or url
+        response = self.get(url)
+        json_response = safe_json(response)
+        next_page = response.get("next", None)
 
     def get(self, **kwargs):
         response = self.session.get(**kwargs)
         return response
+
+
+def safe_json(response):
+    return response.json()
