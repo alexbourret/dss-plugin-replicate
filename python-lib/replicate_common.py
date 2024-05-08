@@ -1,3 +1,6 @@
+import requests
+
+
 MANUAL_SELECT_ENTRY = {"label": "✍️ Enter manually", "value": "dku_manual_select"}
 COLUMN_SELECT_ENTRY = {"label": "🏛️ Get from column", "value": "dku_column_select"}
 
@@ -58,15 +61,51 @@ class DSSSelectorChoices(object):
         return self._build_select_choices(self.choices)
 
 
-# LX:do:payload={'parameterType': 'SELECT', 'parameterName': 'model', 'customChoices': True, 'rootModel': {'auth_type': 'service-api-token', 'parameter2': 42, 'service_token': {'mode': 'PRESET', 'name': 'Alex B'}}}, config={'auth_type': 'service-api-token', 'parameter2': 42, 'service_token': {'api_token': 'blaa'}}
 def get_api_token(config):
     token = None
-    print("ALX:1")
     auth_type = config.get("auth_type", "service-api-token")
-    print("ALX:2:{}".format(auth_type))
     if auth_type == "service-api-token":
-        print("ALX:3")
         token = config.get("service_token", {}).get("api_token")
-        print("ALX:4:{}".format(token))
-    print("ALX:5:{}".format(token))
     return token
+
+
+def get_prompt_template(config):
+    prompt_type = config.get("prompt_type", "body")
+    if prompt_type == "body":
+        return config.get("prompt_body_template", ""), None
+    else:
+        return None, config.get("prompt_column", "")
+
+
+def get_prompt_from_column(input_row, prompt_column):
+    return input_row.get(prompt_column)
+
+
+def format_prediction_output(prediction):
+    raw_prediction_output = prediction.get("output")
+    if isinstance(raw_prediction_output, list):
+        prediction_output = ""
+        for output_token in raw_prediction_output:
+            prediction_output += output_token
+    else:
+        prediction_output = raw_prediction_output
+    return prediction_output
+
+
+def process_template(template, dictionnary):
+    template = str(template)
+    for key in dictionnary:
+        replacement = str(dictionnary.get(key, ""))
+        template = template.replace("{{{{{}}}}}".format(key), str(replacement))
+    return template
+
+
+def download_file(url_to_file, folder_handle):
+    tokens = url_to_file.split("/")
+    file_name = "_".join(tokens[-2:])
+
+    response = requests.get(url_to_file, stream=True)
+    with folder_handle.get_writer(file_name) as file_handle:
+        for chunk in response.iter_content(chunk_size=1024): 
+            if chunk:
+                file_handle.write(chunk)

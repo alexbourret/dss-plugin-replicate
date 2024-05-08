@@ -1,79 +1,62 @@
-# Code for custom code recipe run-prediction (imported from a Python recipe)
-
-# To finish creating your custom recipe from your original PySpark recipe, you need to:
-#  - Declare the input and output roles in recipe.json
-#  - Replace the dataset names by roles access in your code
-#  - Declare, if any, the params of your custom recipe in recipe.json
-#  - Replace the hardcoded params values by acccess to the configuration map
-
-# See sample code below for how to do that.
-# The code of your original recipe is included afterwards for convenience.
-# Please also see the "recipe.json" file for more information.
-
-# import the classes for accessing DSS objects from the recipe
 import dataiku
-# Import the helpers for custom recipes
+import pandas
+import json
 from dataiku.customrecipe import get_input_names_for_role
 from dataiku.customrecipe import get_output_names_for_role
 from dataiku.customrecipe import get_recipe_config
+from replicate_client import ReplicateSession
+from replicate_common import (
+    get_prompt_template, get_api_token, get_prompt_from_column, format_prediction_output,
+    process_template, download_file
+)
 
-# Inputs and outputs are defined by roles. In the recipe's I/O tab, the user can associate one
-# or more dataset to each input and output role.
-# Roles need to be defined in recipe.json, in the inputRoles and outputRoles fields.
 
-# To  retrieve the datasets of an input role named 'input_A' as an array of dataset names:
 input_A_names = get_input_names_for_role('input_A_role')
-# The dataset objects themselves can then be created like this:
 input_A_datasets = [dataiku.Dataset(name) for name in input_A_names]
 
-# For outputs, the process is the same:
+input_B_names = get_input_names_for_role('input_B_role')
+
 output_A_names = get_output_names_for_role('main_output')
-output_A_datasets = [dataiku.Dataset(name) for name in output_A_names]
 
+output_folder = get_output_names_for_role('output_folder')
 
-# The configuration consists of the parameters set up by the user in the recipe Settings tab.
-
-# Parameters must be added to the recipe.json file so that DSS can prompt the user for values in
-# the Settings tab of the recipe. The field "params" holds a list of all the params for wich the
-# user will be prompted for values.
-
-# The configuration is simply a map of parameters, and retrieving the value of one of them is simply:
-my_variable = get_recipe_config()['parameter_name']
-
-# For optional parameters, you should provide a default value in case the parameter is not present:
-my_variable = get_recipe_config().get('parameter_name', None)
-
-# Note about typing:
-# The configuration of the recipe is passed through a JSON object
-# As such, INT parameters of the recipe are received in the get_recipe_config() dict as a Python float.
-# If you absolutely require a Python int, use int(get_recipe_config()["my_int_param"])
-
-
-#############################
-# Your original recipe
-#############################
-
-# -*- coding: utf-8 -*-
-import dataiku
-import pandas as pd, numpy as np
-from dataiku import pandasutils as pdu
-
-# Read recipe inputs
-Source = dataiku.Dataset("Source")
+Source = input_A_datasets[0]
 Source_df = Source.get_dataframe()
-Source_folder = dataiku.Folder("Source folder")
-Source_folder_info = Source_folder.get_info()
 
+config = get_recipe_config()
 
-# Compute recipe outputs from inputs
-# TODO: Replace this part by your actual code that computes the output, as a Pandas dataframe
-# NB: DSS also supports other kinds of APIs for reading and writing data. Please see doc.
+prompt_body_template = config.get("prompt_body_template", "")
 
-output_dataset_df = Source_df # For this sample code, simply copy input to output
+model_name = config.get("model_name")
+model_version = config.get("model_version")
+prompt_template, prompt_column = get_prompt_template(config)
+api_token = get_api_token(config)
+session = ReplicateSession(api_token=api_token)
+predictions = []
+output = dataiku.Dataset(output_A_names[0])
+first_dataframe = True
 
+if output_folder:
+    output_folder_handle = dataiku.Folder(output_folder[0])
 
-# Write recipe outputs
-output_dataset = dataiku.Dataset("output_dataset")
-output_dataset.write_with_schema(output_dataset_df)
-Output_folder = dataiku.Folder("Output folder")
-Output_folder_info = Output_folder.get_info()
+with output.get_writer() as writer:
+    for index, input_parameters_row in Source_df.iterrows():
+        input_row = input_parameters_row.to_json()
+        input_row = json.loads(input_row)
+        if prompt_column:
+            prompt_template = get_prompt_from_column(input_row, prompt_column)
+        prompt = process_template(prompt_template, input_row)
+        prediction = session.get_prediction(model_name, model_version, prompt)
+        prediction_output = format_prediction_output(prediction)
+        output_row = input_row.copy()
+        output_row.update({"prediction": prediction.get("output")})
+        output_row_dataframe = pandas.DataFrame([output_row])
+        if first_dataframe:
+            output.write_schema_from_dataframe(output_row_dataframe)
+            first_dataframe = False
+        if not output_row_dataframe.empty:
+            writer.write_dataframe(output_row_dataframe)
+        if output_folder:
+            output_urls = prediction.get("output", [])
+            for output_url in output_urls:
+                download_file(output_url, output_folder_handle)
